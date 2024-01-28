@@ -13,36 +13,32 @@ fn activate(app: *c.GtkApplication) callconv(.C) void {
     c.gtk_window_set_modal(@ptrCast(window), 1);
     c.gtk_window_set_resizable(@ptrCast(window), 0);
     c.gtk_window_set_default_size(@ptrCast(window), @as(c_int, 800), @as(c_int, 600));
-    c.gtk_window_set_icon_name(@ptrCast(window), "system-shutdown");
+    c.gtk_window_set_icon_name(@ptrCast(window), "application-exit");
 
     // Exit on ESC key press
     const eck = c.gtk_event_controller_key_new();
     c.gtk_widget_add_controller(window, eck);
 
-    connectSignal(
-        eck,
-        "key-pressed",
-        @ptrCast(&handleEscapeKeypress),
-        @ptrCast(window),
-    );
-
-    const box = c.gtk_box_new(c.GTK_ORIENTATION_VERTICAL, 100);
-    c.gtk_window_set_child(@ptrCast(window), box);
-    inline for (.{ .top, .bottom, .start, .end }) |fun| {
-        @field(c, "gtk_widget_set_margin_" ++ @tagName(fun))(box, 20);
-    }
-
+    // Header
+    const header_box = c.gtk_box_new(c.GTK_ORIENTATION_HORIZONTAL, 10);
+    c.gtk_window_set_child(@ptrCast(window), header_box);
+    const label = c.gtk_label_new("chibino");
     const exit_button = c.gtk_button_new();
-    c.gtk_box_append(@ptrCast(box), exit_button);
-
     const exit_icon = c.gtk_image_new_from_icon_name("application-exit");
     c.gtk_button_set_child(@ptrCast(exit_button), exit_icon);
-
     c.gtk_image_set_pixel_size(@ptrCast(exit_icon), 20);
 
-    const callback: c.GCallback = @ptrCast(&handlePressExitButton);
+    // Header Margins
+    inline for (.{ .top, .bottom, .start, .end }) |direction| {
+        @field(c, "gtk_widget_set_margin_" ++ @tagName(direction))(header_box, 20);
+    }
 
-    connectSignal(exit_button, "clicked", callback, @ptrCast(window));
+    // Signals
+    connectSignal(eck, "key-pressed", @ptrCast(&handleEscapeKeypress), @ptrCast(window));
+    connectSignal(exit_button, "clicked", @ptrCast(&handlePressExitButton), @ptrCast(window));
+
+    c.gtk_box_append(@ptrCast(header_box), exit_button);
+    c.gtk_box_append(@ptrCast(header_box), label);
 
     // show window
     c.gtk_widget_show(@ptrCast(window));
@@ -73,7 +69,10 @@ fn handleEscapeKeypress(
 }
 
 fn handlePressExitButton(
+    state: c.GdkModifierType,
     win: *c.GtkWindow,
-) void {
+) c.gboolean {
+    _ = state; // autofix
     c.gtk_window_close(win);
+    return 1;
 }
