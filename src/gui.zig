@@ -9,36 +9,48 @@ fn connectSignal(instance: c.gpointer, detailed_signal: [*c]const c.gchar, c_han
 fn activate(app: *c.GtkApplication) callconv(.C) void {
     // setup the window
     const window = c.gtk_application_window_new(app);
-    c.gtk_window_set_title(@ptrCast(window), "chibino");
+    c.gtk_window_set_title(@ptrCast(window), "Chibino");
     c.gtk_window_set_modal(@ptrCast(window), 1);
-    c.gtk_window_set_resizable(@ptrCast(window), 0);
+    c.gtk_window_set_resizable(@ptrCast(window), 1);
     c.gtk_window_set_default_size(@ptrCast(window), @as(c_int, 800), @as(c_int, 600));
-    c.gtk_window_set_icon_name(@ptrCast(window), "application-exit");
+    const main_box = c.gtk_box_new(c.GTK_ORIENTATION_VERTICAL, 2);
+    c.gtk_window_set_child(@ptrCast(window), main_box);
 
     // Exit on ESC key press
     const eck = c.gtk_event_controller_key_new();
     c.gtk_widget_add_controller(window, eck);
 
     // Header
-    const header_box = c.gtk_box_new(c.GTK_ORIENTATION_HORIZONTAL, 10);
-    c.gtk_window_set_child(@ptrCast(window), header_box);
-    const label = c.gtk_label_new("chibino");
+    const header_box = c.gtk_box_new(c.GTK_ORIENTATION_HORIZONTAL, 20);
+    const label = c.gtk_label_new("   Chibino");
     const exit_button = c.gtk_button_new();
     const exit_icon = c.gtk_image_new_from_icon_name("application-exit");
     c.gtk_button_set_child(@ptrCast(exit_button), exit_icon);
     c.gtk_image_set_pixel_size(@ptrCast(exit_icon), 20);
+    c.gtk_box_append(@ptrCast(header_box), exit_button);
+    c.gtk_box_append(@ptrCast(header_box), label);
 
-    // Header Margins
+    // Text view
+    const body_box = c.gtk_box_new(c.GTK_ORIENTATION_VERTICAL, 2);
+    const text_view = c.gtk_text_view_new();
+    c.gtk_text_view_set_wrap_mode(@ptrCast(text_view), c.GTK_WRAP_WORD);
+    c.gtk_text_view_set_editable(@ptrCast(text_view), 1);
+    c.gtk_widget_set_size_request(@ptrCast(text_view), -1, 200);
+    c.gtk_box_append(@ptrCast(body_box), @ptrCast(text_view));
+
+    // Margins
     inline for (.{ .top, .bottom, .start, .end }) |direction| {
         @field(c, "gtk_widget_set_margin_" ++ @tagName(direction))(header_box, 20);
+        @field(c, "gtk_widget_set_margin_" ++ @tagName(direction))(body_box, 20);
     }
+
+    // Appending boxes
+    c.gtk_box_append(@ptrCast(main_box), @ptrCast(header_box));
+    c.gtk_box_append(@ptrCast(main_box), @ptrCast(body_box));
 
     // Signals
     connectSignal(eck, "key-pressed", @ptrCast(&handleEscapeKeypress), @ptrCast(window));
     connectSignal(exit_button, "clicked", @ptrCast(&handlePressExitButton), @ptrCast(window));
-
-    c.gtk_box_append(@ptrCast(header_box), exit_button);
-    c.gtk_box_append(@ptrCast(header_box), label);
 
     // show window
     c.gtk_widget_show(@ptrCast(window));
