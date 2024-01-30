@@ -11,8 +11,8 @@ fn activate(app: *c.GtkApplication) callconv(.C) void {
     const window = c.gtk_application_window_new(app);
     c.gtk_window_set_title(@ptrCast(window), "Chibino");
     c.gtk_window_set_modal(@ptrCast(window), 1);
-    c.gtk_window_set_resizable(@ptrCast(window), 1);
-    c.gtk_window_set_default_size(@ptrCast(window), @as(c_int, 800), @as(c_int, 600));
+    c.gtk_window_set_resizable(@ptrCast(window), 0);
+    c.gtk_window_set_default_size(@ptrCast(window), 800, 600);
     const main_box = c.gtk_box_new(c.GTK_ORIENTATION_VERTICAL, 2);
     c.gtk_window_set_child(@ptrCast(window), main_box);
 
@@ -35,7 +35,7 @@ fn activate(app: *c.GtkApplication) callconv(.C) void {
     const text_view = c.gtk_text_view_new();
     c.gtk_text_view_set_wrap_mode(@ptrCast(text_view), c.GTK_WRAP_WORD);
     c.gtk_text_view_set_editable(@ptrCast(text_view), 1);
-    c.gtk_widget_set_size_request(@ptrCast(text_view), -1, 200);
+    c.gtk_widget_set_size_request(@ptrCast(text_view), -1, (600 - 20 * 4 - c.gtk_widget_get_height(@ptrCast(header_box))));
     c.gtk_box_append(@ptrCast(body_box), @ptrCast(text_view));
 
     // Margins
