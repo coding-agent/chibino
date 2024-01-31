@@ -1,14 +1,14 @@
 .{
     .name = "chibino",
-        .version = "0.0.1",
-        .minimum_zig_version = "0.12.0",
+    .version = "0.0.1",
+    // .minimum_zig_version = "0.12.0",
 
-        .paths = .{""},
+    .paths = .{""},
 
-        .dependencies = .{
-            .known_folders = .{
-                .url = "git+https://github.com/ziglibs/known-folders.git#806ba01b872820004c7dec3117cb0db66b206af6",
-                .hash = "122094b48dea08e241b48d0ec32e3df6965e814091e3cabaff942e62d053f3ff9b5f",
-            },
+    .dependencies = .{
+        .kf = .{
+            .url = "git+https://github.com/ziglibs/known-folders.git#806ba01b872820004c7dec3117cb0db66b206af6",
+            .hash = "122094b48dea08e241b48d0ec32e3df6965e814091e3cabaff942e62d053f3ff9b5f",
         },
+    },
 }
