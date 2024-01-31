@@ -5,6 +5,8 @@ pub fn build(b: *std.Build) void {
 
     const optimize = b.standardOptimizeOption(.{});
 
+    _ = b.addModule("known-folders", .{});
+
     const lib = b.addStaticLibrary(.{
         .name = "chibino",
         .root_source_file = .{ .path = "src/root.zig" },
