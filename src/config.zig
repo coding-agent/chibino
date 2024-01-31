@@ -10,9 +10,8 @@ pub fn Config(alloc: Allocator) type {
         const allocator = alloc;
 
         pub fn parser() !void {
-            // TODO implement know folders
-            const config_dir = try fs.openDirAbsolute("/home/coding-agent/.config", .{});
-            const config_file = try config_dir.openFile("chibino/config.ini", .{});
+            const config_dir = try kf.open(allocator, .roaming_configuration, .{});
+            const config_file = try config_dir.?.openFile("chibino/config.ini", .{});
 
             const file_buffer = try config_file.readToEndAlloc(allocator, 4000);
             defer allocator.free(file_buffer);

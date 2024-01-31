@@ -4,7 +4,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
 
     const optimize = b.standardOptimizeOption(.{});
-    const kf_dep = b.dependency("kf", .{ .target = target, .optimize = optimize });
+    const kf_dep = b.dependency("kf", .{});
     const kf_module = kf_dep.module("known-folders");
 
     const exe = b.addExecutable(.{
