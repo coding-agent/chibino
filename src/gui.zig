@@ -22,7 +22,7 @@ fn activate(app: *c.GtkApplication) callconv(.C) void {
 
     // Header
     const header_box = c.gtk_box_new(c.GTK_ORIENTATION_HORIZONTAL, 20);
-    const label = c.gtk_label_new("   Chibino");
+    const label = c.gtk_label_new("  " ++ "Chibino");
     const exit_button = c.gtk_button_new();
     const exit_icon = c.gtk_image_new_from_icon_name("application-exit");
     c.gtk_button_set_child(@ptrCast(exit_button), exit_icon);
