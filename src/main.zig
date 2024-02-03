@@ -10,9 +10,10 @@ pub fn main() !u8 {
     const alloc = std.heap.page_allocator;
     const config = @import("config.zig");
     const conf = config.Config(alloc);
-    try conf.parser();
+    try conf.parse();
 
     gui.init(app);
+
     const status = c.g_application_run(@ptrCast(app), 0, null);
     return @intCast(status);
 }

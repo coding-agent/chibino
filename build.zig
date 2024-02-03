@@ -2,10 +2,18 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
-
     const optimize = b.standardOptimizeOption(.{});
-    const kf_dep = b.dependency("kf", .{});
+
+    const kf_dep = b.dependency("kf", .{
+        .target = target,
+        .optimize = optimize,
+    });
     const kf_module = kf_dep.module("known-folders");
+
+    const ini_module = b.dependency("ini", .{
+        .target = target,
+        .optimize = optimize,
+    }).module("ini");
 
     const exe = b.addExecutable(.{
         .name = "chibino",
@@ -15,6 +23,8 @@ pub fn build(b: *std.Build) void {
     });
 
     exe.root_module.addImport("known-folders", kf_module);
+    exe.root_module.addImport("ini", ini_module);
+
     exe.linkSystemLibrary("gtk4");
     exe.linkLibC();
 

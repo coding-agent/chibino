@@ -1,7 +1,7 @@
 const std = @import("std");
-const kf = @import("known-folders");
+const Kf = @import("known-folders");
+const Ini = @import("ini");
 const fs = std.fs;
-const Ini = std.Ini;
 const Allocator = std.mem.Allocator;
 
 pub fn Config(alloc: Allocator) type {
@@ -9,18 +9,31 @@ pub fn Config(alloc: Allocator) type {
         const Self = @This();
         const allocator = alloc;
 
-        pub fn parser() !void {
-            const config_dir = try kf.open(allocator, .roaming_configuration, .{});
+        var name: []const u8 = "Chibino";
+        stickers_path: ?fs.Dir,
+        sticker_name: ?fs.File,
+        default_dir: ?fs.Dir,
+        theme: ?[]const u8,
+
+        pub fn parse() !void {
+            const config_dir = try Kf.open(allocator, .roaming_configuration, .{});
             const config_file = try config_dir.?.openFile("chibino/config.ini", .{});
 
-            const file_buffer = try config_file.readToEndAlloc(allocator, 4000);
-            defer allocator.free(file_buffer);
+            var parser = Ini.parse(allocator, config_file.reader());
+            defer parser.deinit();
 
-            const ini: Ini = .{ .bytes = file_buffer };
-            var it_example = ini.iterateSection("\n[config]\n");
-
-            while (it_example.next()) |it| {
-                std.debug.print("{s}", .{it});
+            while (try parser.next()) |line| {
+                switch (line) {
+                    .section => |sec| {
+                        std.debug.print("section {s}\n", .{sec});
+                    },
+                    .property => |prop| {
+                        std.debug.print("property, key: {s} value {s}\n", .{ prop.key, prop.value });
+                    },
+                    .enumeration => |enumer| {
+                        std.debug.print("enumeration {s}\n", .{enumer});
+                    },
+                }
             }
         }
     };
