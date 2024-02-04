@@ -9,8 +9,8 @@ pub fn main() !u8 {
 
     const alloc = std.heap.page_allocator;
     const config = @import("config.zig");
-    const conf = config.Config(alloc);
-    try conf.parse();
+    const conf = config.init(alloc);
+    _ = conf; // autofix
 
     gui.init(app);
 
